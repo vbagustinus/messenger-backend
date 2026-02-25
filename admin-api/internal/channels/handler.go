@@ -4,6 +4,7 @@ import (
 	"admin-service/internal/audit"
 	"admin-service/internal/db"
 	"net/http"
+	"strings"
 	"time"
 
 	"admin-service/internal/auth"
@@ -84,6 +85,7 @@ func Create(c *gin.Context) {
 	if req.Type == "" {
 		req.Type = "public"
 	}
+	req.DepartmentID = strings.TrimSpace(req.DepartmentID)
 
 	id := uuid.New().String()
 	now := time.Now().Unix()
@@ -96,12 +98,32 @@ func Create(c *gin.Context) {
 	}
 	defer tx.Rollback()
 
+	var nameExists int
+	_ = tx.QueryRow(`SELECT COUNT(1) FROM channels WHERE lower(name) = lower(?)`, req.Name).Scan(&nameExists)
+	if nameExists > 0 {
+		c.JSON(http.StatusConflict, gin.H{"error": "channel already exists"})
+		return
+	}
+
+	var departmentValue interface{}
+	if req.DepartmentID != "" {
+		departmentValue = req.DepartmentID
+	}
+
 	_, err = tx.Exec(
 		`INSERT INTO channels (id, name, type, department_id, created_at, updated_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		id, req.Name, req.Type, req.DepartmentID, now, now, claims.UserID,
+		id, req.Name, req.Type, departmentValue, now, now, claims.UserID,
 	)
 	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "channel exists or db error"})
+		errMsg := err.Error()
+		switch {
+		case strings.Contains(errMsg, "UNIQUE constraint failed"):
+			c.JSON(http.StatusConflict, gin.H{"error": "channel already exists"})
+		case strings.Contains(errMsg, "FOREIGN KEY constraint failed"):
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid department_id"})
+		default:
+			c.JSON(http.StatusConflict, gin.H{"error": "channel exists or db error"})
+		}
 		return
 	}
 
