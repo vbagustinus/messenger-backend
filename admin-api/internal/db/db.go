@@ -141,6 +141,30 @@ func ensureColumns() error {
 			return err
 		}
 	}
+	if !columnExists("channels", "department_id") {
+		if _, err := DB.Exec(`ALTER TABLE channels ADD COLUMN department_id TEXT`); err != nil {
+			return err
+		}
+	}
+	if !columnExists("channels", "created_at") {
+		if _, err := DB.Exec(`ALTER TABLE channels ADD COLUMN created_at INTEGER NOT NULL DEFAULT 0`); err != nil {
+			return err
+		}
+		now := time.Now().Unix()
+		_, _ = DB.Exec(`UPDATE channels SET created_at = ? WHERE created_at = 0`, now)
+	}
+	if !columnExists("channels", "updated_at") {
+		if _, err := DB.Exec(`ALTER TABLE channels ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0`); err != nil {
+			return err
+		}
+		now := time.Now().Unix()
+		_, _ = DB.Exec(`UPDATE channels SET updated_at = ? WHERE updated_at = 0`, now)
+	}
+	if !columnExists("channels", "created_by") {
+		if _, err := DB.Exec(`ALTER TABLE channels ADD COLUMN created_by TEXT`); err != nil {
+			return err
+		}
+	}
 
 	// channel_members used to only have (channel_id, user_id). Newer versions require role+joined_at.
 	if !columnExists("channel_members", "role") {
