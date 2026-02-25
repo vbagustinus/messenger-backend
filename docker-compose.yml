@@ -1,0 +1,114 @@
+name: lan-chat-backend
+
+services:
+  discovery:
+    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    command: ["/usr/local/bin/discovery", "node-1"]
+    ports:
+      - "8080:8080"
+      - "5354:5353/udp"
+    networks:
+      - lan-chat-net
+    restart: unless-stopped
+
+  auth:
+    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    command: ["/usr/local/bin/auth"]
+    environment:
+      AUTH_DB_PATH: /app/data/platform.db
+    ports:
+      - "8086:8086"
+    volumes:
+      - shared_data:/app/data
+    networks:
+      - lan-chat-net
+    restart: unless-stopped
+
+  admin-service:
+    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    command: ["/usr/local/bin/admin-service"]
+    environment:
+      ADMIN_DB_PATH: /app/data/platform.db
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-change-me-admin}
+      ADMIN_ACCESS_LOG_DIR: /app/data/logs
+    ports:
+      - "8090:8090"
+    volumes:
+      - shared_data:/app/data
+    networks:
+      - lan-chat-net
+    restart: unless-stopped
+
+  messaging:
+    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    command: ["/usr/local/bin/messaging"]
+    environment:
+      MESSAGING_DB_PATH: /app/data/platform.db
+      MESSAGING_JWT_SECRET: ${MESSAGING_JWT_SECRET:-my_secret_key}
+    ports:
+      - "8081:8081"
+    volumes:
+      - shared_data:/app/data
+    networks:
+      - lan-chat-net
+    restart: unless-stopped
+
+  filetransfer:
+    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    command: ["/usr/local/bin/filetransfer"]
+    ports:
+      - "8082:8082"
+    volumes:
+      - files_data:/app/storage
+    networks:
+      - lan-chat-net
+    restart: unless-stopped
+
+  presence:
+    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    command: ["/usr/local/bin/presence"]
+    environment:
+      PRESENCE_DB_PATH: /app/data/platform.db
+    ports:
+      - "8083:8083"
+    volumes:
+      - shared_data:/app/data
+    networks:
+      - lan-chat-net
+    restart: unless-stopped
+
+  audit:
+    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    command: ["/usr/local/bin/audit"]
+    ports:
+      - "8084:8084"
+    volumes:
+      - audit_data:/app/data
+    networks:
+      - lan-chat-net
+    restart: unless-stopped
+
+  cluster:
+    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    command: ["/usr/local/bin/cluster"]
+    environment:
+      NODE_ID: ${NODE_ID:-node-1}
+      PORT: "8085"
+    ports:
+      - "8085:8085"
+      - "10001:10001"
+    volumes:
+      - raft_data:/app/raft-data
+    networks:
+      - lan-chat-net
+    restart: unless-stopped
+
+networks:
+  lan-chat-net:
+    driver: bridge
+
+volumes:
+  shared_data:
+  files_data:
+  audit_data:
+  raft_data:
