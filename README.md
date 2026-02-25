@@ -10,6 +10,7 @@ Deploy via Portainer:
 - Git mode default compose path: `docker-compose.yml` (root fallback untuk kompatibilitas Portainer).
 - File sumber backend stack: `backend/deploy/docker-compose.yml`.
 - Panduan: `backend/docs/operations/portainer-stack.md`.
+- Catatan cepat: `backend/docker-compose.yml` memakai mode `build` (tanpa `BACKEND_IMAGE`).
 
 ---
 

@@ -2,7 +2,9 @@ name: lan-chat-backend
 
 services:
   discovery:
-    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     command: ["/usr/local/bin/discovery", "node-1"]
     ports:
       - "8080:8080"
@@ -12,7 +14,9 @@ services:
     restart: unless-stopped
 
   auth:
-    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     command: ["/usr/local/bin/auth"]
     environment:
       AUTH_DB_PATH: /app/data/platform.db
@@ -25,7 +29,9 @@ services:
     restart: unless-stopped
 
   admin-service:
-    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     command: ["/usr/local/bin/admin-service"]
     environment:
       ADMIN_DB_PATH: /app/data/platform.db
@@ -40,7 +46,9 @@ services:
     restart: unless-stopped
 
   messaging:
-    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     command: ["/usr/local/bin/messaging"]
     environment:
       MESSAGING_DB_PATH: /app/data/platform.db
@@ -54,7 +62,9 @@ services:
     restart: unless-stopped
 
   filetransfer:
-    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     command: ["/usr/local/bin/filetransfer"]
     ports:
       - "8082:8082"
@@ -65,7 +75,9 @@ services:
     restart: unless-stopped
 
   presence:
-    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     command: ["/usr/local/bin/presence"]
     environment:
       PRESENCE_DB_PATH: /app/data/platform.db
@@ -78,7 +90,9 @@ services:
     restart: unless-stopped
 
   audit:
-    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     command: ["/usr/local/bin/audit"]
     ports:
       - "8084:8084"
@@ -89,7 +103,9 @@ services:
     restart: unless-stopped
 
   cluster:
-    image: ${BACKEND_IMAGE:-ghcr.io/ziyadbooks/lan-chat-backend:latest}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     command: ["/usr/local/bin/cluster"]
     environment:
       NODE_ID: ${NODE_ID:-node-1}
