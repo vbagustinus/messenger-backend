@@ -7,11 +7,11 @@ WORKDIR /app
 
 # Copy generic files
 COPY go.work go.work.sum* ./
-COPY backend/pkg ./backend/pkg
+COPY pkg ./pkg
 
 # Copy service sources
-COPY backend/services ./backend/services
-COPY backend/admin-api ./backend/admin-api
+COPY services ./services
+COPY admin-api ./admin-api
 
 # Ensure dependencies are available (if any external)
 ENV GOSUMDB=off
@@ -19,31 +19,31 @@ ENV CGO_ENABLED=1
 RUN go mod download || true
 
 # Build Discovery Service
-RUN go build -o /bin/discovery ./backend/services/discovery
+RUN go build -o /bin/discovery ./services/discovery
 
 # Build Audit Service
-RUN go build -o /bin/audit ./backend/services/audit
+RUN go build -o /bin/audit ./services/audit
 
 # Build Auth Service
-RUN go build -o /bin/auth ./backend/services/auth
+RUN go build -o /bin/auth ./services/auth
 
 # Build Messaging Service
-RUN go build -o /bin/messaging ./backend/services/messaging
+RUN go build -o /bin/messaging ./services/messaging
 
 # Build PKI Service
-RUN go build -o /bin/pki ./backend/services/pki
+RUN go build -o /bin/pki ./services/pki
 
 # Build Presence Service
-RUN go build -o /bin/presence ./backend/services/presence
+RUN go build -o /bin/presence ./services/presence
 
 # Build File Transfer Service
-RUN go build -o /bin/filetransfer ./backend/services/filetransfer
+RUN go build -o /bin/filetransfer ./services/filetransfer
 
 # Build Cluster Service
-RUN go build -o /bin/cluster ./backend/services/cluster
+RUN go build -o /bin/cluster ./services/cluster
 
 # Build Admin Service
-RUN go build -o /bin/admin-service ./backend/admin-api/cmd/server
+RUN go build -o /bin/admin-service ./admin-api/cmd/server
 
 # Final Stage (Unified Image for Simplicity, or use separate targets)
 FROM alpine:latest

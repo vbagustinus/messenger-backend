@@ -27,7 +27,7 @@ cd backend && go test ./...
 cd ../clients/desktop-app && flutter test
 
 # Build Docker images
-docker build -f backend/deploy/Dockerfile -t lan-chat/services:${VERSION} .
+docker build -f deploy/Dockerfile -t lan-chat/services:${VERSION} .
 # Or separate Dockerfile per service
 ```
 

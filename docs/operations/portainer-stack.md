@@ -9,8 +9,8 @@ Stack Portainer ini memakai satu image yang berisi semua binary service backend.
 Contoh build + push:
 
 ```bash
-# dari root project
-docker build -f backend/deploy/Dockerfile -t ghcr.io/ziyadbooks/lan-chat-backend:latest .
+# dari root repo backend
+docker build -f deploy/Dockerfile -t ghcr.io/ziyadbooks/lan-chat-backend:latest .
 docker push ghcr.io/ziyadbooks/lan-chat-backend:latest
 ```
 
